@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>College Management System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0b0f1a;
+      --surface: rgba(255,255,255,0.04);
+      --border: rgba(255,255,255,0.1);
+      --border-hover: rgba(255,255,255,0.25);
+      --accent: #c8a96e;
+      --accent2: #6eb5c8;
+      --danger: #c86e6e;
+      --success: #6ec89a;
+      --text: #f0ece4;
+      --text2: rgba(240,236,228,0.55);
+      --text3: rgba(240,236,228,0.3);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Background ── */
+    .bg-layer {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 80% 60% at 10% 10%, rgba(200,169,110,0.07) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 90% 90%, rgba(110,181,200,0.07) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 50% 50%, rgba(110,200,154,0.03) 0%, transparent 70%);
+    }
+
+    .grid-overlay {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+
+    /* ── Layout ── */
+    .page {
+      position: relative; z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 3rem 2rem 6rem;
+    }
+
+    /* ── Header ── */
+    header {
+      display: flex; align-items: flex-end; justify-content: space-between;
+      margin-bottom: 4rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--border);
+      animation: fadeDown 0.8s ease both;
+    }
+
+  
+
+    .eyebrow {
+      font-size: 0.65rem; letter-spacing: 0.4em;
+      text-transform: uppercase; color: var(--accent);
+      margin-bottom: 0.6rem; font-weight: 500;
+    }
+
+    h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 700; line-height: 0.9;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, var(--text) 40%, var(--accent) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header-sub {
+      font-size: 0.8rem; color: var(--text2);
+      margin-top: 0.8rem; font-weight: 300; letter-spacing: 0.02em;
+    }
+
+    .live-badge {
+      display: flex; align-items: center; gap: 0.5rem;
+      font-size: 0.7rem; color: var(--success);
+      letter-spacing: 0.1em; text-transform: uppercase;
+    }
+    .live-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 8px var(--success);
+      animation: pulse 2s ease infinite;
+    }
+
+    /* ── Tabs ── */
+    .tabs {
+      display: flex; gap: 0; margin-bottom: 2.5rem;
+      border: 1px solid var(--border); border-radius: 12px;
+      overflow: hidden; animation: fadeUp 0.8s 0.1s ease both;
+      background: var(--surface);
+    }
+
+    .tab {
+      flex: 1; padding: 0.85rem 1rem;
+      background: none; border: none; color: var(--text2);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.78rem; font-weight: 500;
+      letter-spacing: 0.05em; text-transform: uppercase;
+      cursor: pointer; transition: all 0.25s ease;
+      position: relative;
+    }
+    .tab + .tab { border-left: 1px solid var(--border); }
+    .tab:hover { color: var(--text); background: rgba(255,255,255,0.04); }
+    .tab.active {
+      color: var(--bg); background: var(--accent);
+      font-weight: 600;
+    }
+    .tab-icon { margin-right: 0.4rem; }
+
+    /* ── Panels ── */
+    .panel { display: none; animation: fadeUp 0.4s ease both; }
+    .panel.active { display: block; }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+      backdrop-filter: blur(10px);
+      transition: border-color 0.3s;
+    }
+    .card:hover { border-color: var(--border-hover); }
+
+    .card-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem; font-weight: 600;
+      margin-bottom: 0.4rem; color: var(--text);
+    }
+    .card-desc { font-size: 0.78rem; color: var(--text2); margin-bottom: 1.8rem; }
+
+    /* ── Form ── */
+    .form-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 1.2rem; margin-bottom: 1.5rem;
+    }
+    @media(max-width:600px) { .form-grid { grid-template-columns: 1fr; } }
+
+    .field { display: flex; flex-direction: column; gap: 0.4rem; }
+    .field.full { grid-column: 1 / -1; }
+
+    label {
+      font-size: 0.65rem; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--text2); font-weight: 500;
+    }
+
+    input, select {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 8px; padding: 0.75rem 1rem;
+      color: var(--text); font-family: 'DM Sans', sans-serif;
+      font-size: 0.875rem; outline: none;
+      transition: border-color 0.25s, box-shadow 0.25s;
+    }
+    input:focus, select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(200,169,110,0.12);
+    }
+    input::placeholder { color: var(--text3); }
+    select option { background: #1a1f2e; }
+
+    /* ── Buttons ── */
+    .btn {
+      padding: 0.8rem 2rem; border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.8rem; font-weight: 600;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      cursor: pointer; border: none;
+      transition: all 0.25s ease;
+    }
+    .btn-gold {
+      background: var(--accent); color: var(--bg);
+    }
+    .btn-gold:hover {
+      background: #d4b87a;
+      box-shadow: 0 4px 20px rgba(200,169,110,0.35);
+      transform: translateY(-1px);
+    }
+    .btn-outline {
+      background: transparent; color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-outline:hover {
+      border-color: var(--accent2); color: var(--accent2);
+      box-shadow: 0 4px 15px rgba(110,181,200,0.15);
+    }
+    .btn-danger {
+      background: transparent; color: var(--danger);
+      border: 1px solid rgba(200,110,110,0.3);
+      padding: 0.5rem 1rem; font-size: 0.72rem;
+    }
+    .btn-danger:hover {
+      background: rgba(200,110,110,0.1);
+      border-color: var(--danger);
+    }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+    /* ── Status ── */
+    .status-msg {
+      font-size: 0.78rem; padding: 0.7rem 1rem;
+      border-radius: 8px; margin-top: 1rem;
+      display: none;
+    }
+    .status-msg.show { display: block; }
+    .status-msg.success { background: rgba(110,200,154,0.12); color: var(--success); border: 1px solid rgba(110,200,154,0.25); }
+    .status-msg.error   { background: rgba(200,110,110,0.12); color: var(--danger);  border: 1px solid rgba(200,110,110,0.25); }
+
+    /* ── Search bar ── */
+    .search-row {
+      display: flex; gap: 0.8rem; margin-bottom: 1.5rem;
+      animation: fadeUp 0.4s ease both;
+    }
+    .search-row input { flex: 1; }
+
+    /* ── Student Table ── */
+    .table-wrap {
+      border: 1px solid var(--border); border-radius: 12px;
+      overflow: hidden; animation: fadeUp 0.5s ease both;
+    }
+
+    table { width: 100%; border-collapse: collapse; }
+
+    thead { background: rgba(200,169,110,0.08); }
+    th {
+      padding: 0.9rem 1.2rem; text-align: left;
+      font-size: 0.62rem; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--accent);
+      font-weight: 600; border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      padding: 0.9rem 1.2rem; font-size: 0.82rem;
+      color: var(--text2); border-bottom: 1px solid rgba(255,255,255,0.04);
+      transition: background 0.2s;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,0.03); color: var(--text); }
+
+    .id-badge {
+      font-family: monospace; font-size: 0.72rem;
+      background: rgba(200,169,110,0.1); color: var(--accent);
+      padding: 0.2rem 0.5rem; border-radius: 4px;
+      border: 1px solid rgba(200,169,110,0.2);
+    }
+
+    .empty-state {
+      text-align: center; padding: 4rem 2rem;
+      color: var(--text3); font-size: 0.85rem;
+    }
+    .empty-icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.4; }
+
+    /* ── Student detail card ── */
+    .detail-card {
+      border: 1px solid var(--border); border-radius: 12px;
+      padding: 1.5rem; display: none;
+      animation: fadeUp 0.4s ease both;
+      margin-top: 1.2rem;
+    }
+    .detail-card.show { display: block; }
+
+    .detail-row {
+      display: flex; justify-content: space-between;
+      align-items: center; padding: 0.6rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.82rem;
+    }
+    .detail-row:last-child { border-bottom: none; }
+    .detail-label { color: var(--text2); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; }
+    .detail-val { color: var(--text); font-weight: 500; }
+
+    /* ── Stats ── */
+    .stats-row {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 1rem; margin-bottom: 2rem;
+      animation: fadeUp 0.4s ease both;
+    }
+    .stat-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.2rem 1.5rem;
+      text-align: center;
+    }
+    .stat-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.5rem; font-weight: 700;
+      color: var(--accent); line-height: 1;
+    }
+    .stat-label { font-size: 0.65rem; color: var(--text2); text-transform: uppercase; letter-spacing: 0.15em; margin-top: 0.3rem; }
+
+    /* ── Animations ── */
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.5; transform: scale(0.85); }
+    }
+
+    .section-gap { margin-top: 1.5rem; }
+  </style>
+</head>
+<body>
+
+<div class="bg-layer"></div>
+<div class="grid-overlay"></div>
+
+<div class="page">
+
+  <!-- Header -->
+  <header>
+    <div class="header-left">
+      <p class="eyebrow">🎓 College Management System</p>
+      <h1>Students</h1>
+      <p class="header-sub">Manage student records · in-memory API</p>
+    </div>
+    <div class="live-badge">
+      <div class="live-dot"></div>
+      API Connected
+    </div>
+  </header>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('view')"><span class="tab-icon">📋</span>All Students</button>
+    <button class="tab" onclick="switchTab('add')"><span class="tab-icon">➕</span>Add Student</button>
+    <button class="tab" onclick="switchTab('search')"><span class="tab-icon">🔍</span>Search</button>
+    <button class="tab" onclick="switchTab('update')"><span class="tab-icon">✏️</span>Update</button>
+    <button class="tab" onclick="switchTab('delete')"><span class="tab-icon">🗑️</span>Delete</button>
+  </div>
+
+  <!-- ── VIEW ALL ── -->
+  <div class="panel active" id="panel-view">
+    <div class="stats-row" id="statsRow">
+      <div class="stat-card">
+        <div class="stat-num" id="statTotal">0</div>
+        <div class="stat-label">Total Students</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="statAvgAge">—</div>
+        <div class="stat-label">Average Age</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="statCourses">0</div>
+        <div class="stat-label">Courses</div>
+      </div>
+    </div>
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+      <span style="font-size:0.75rem; color:var(--text2);">Student Records</span>
+      <button class="btn btn-outline" onclick="loadAll()" style="padding:0.5rem 1.2rem; font-size:0.72rem;">↻ Refresh</button>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Student ID</th>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Course</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="studentTable">
+          <tr><td colspan="5"><div class="empty-state"><div class="empty-icon">📚</div>Click Refresh to load students</div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── ADD STUDENT ── -->
+  <div class="panel" id="panel-add">
+    <div class="card">
+      <div class="card-title">Add New Student</div>
+      <div class="card-desc">Fill in the details below to register a new student</div>
+
+      <div class="form-grid">
+        <div class="field">
+          <label>Student ID</label>
+          <input type="text" id="add-id" placeholder="e.g. NP01MS7A240036"/>
+        </div>
+        <div class="field">
+          <label>Full Name</label>
+          <input type="text" id="add-name" placeholder="e.g. John Doe"/>
+        </div>
+        <div class="field">
+          <label>Age</label>
+          <input type="number" id="add-age" placeholder="e.g. 20" min="16" max="60"/>
+        </div>
+        <div class="field">
+          <label>Course</label>
+          <input type="text" id="add-course" placeholder="e.g. Computer Science"/>
+        </div>
+      </div>
+
+      <button class="btn btn-gold" onclick="addStudent()">✦ Register Student</button>
+      <div class="status-msg" id="add-status"></div>
+    </div>
+  </div>
+
+  <!-- ── SEARCH ── -->
+  <div class="panel" id="panel-search">
+    <div class="card">
+      <div class="card-title">Search Student</div>
+      <div class="card-desc">Find a student by their unique ID</div>
+
+      <div class="search-row">
+        <input type="text" id="search-id" placeholder="Enter Student ID..."/>
+        <button class="btn btn-gold" onclick="searchStudent()">Search</button>
+      </div>
+
+      <div class="detail-card" id="search-result">
+        <div class="detail-row">
+          <span class="detail-label">Student ID</span>
+          <span class="detail-val id-badge" id="res-id"></span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Name</span>
+          <span class="detail-val" id="res-name"></span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Age</span>
+          <span class="detail-val" id="res-age"></span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Course</span>
+          <span class="detail-val" id="res-course"></span>
+        </div>
+      </div>
+      <div class="status-msg" id="search-status"></div>
+    </div>
+  </div>
+
+  <!-- ── UPDATE ── -->
+  <div class="panel" id="panel-update">
+    <div class="card">
+      <div class="card-title">Update Student</div>
+      <div class="card-desc">Enter the Student ID and the new details to update</div>
+
+      <div class="form-grid">
+        <div class="field">
+          <label>Student ID (required)</label>
+          <input type="text" id="upd-id" placeholder="e.g. NP01MS7A240036"/>
+        </div>
+        <div class="field">
+          <label>New Name</label>
+          <input type="text" id="upd-name" placeholder="Updated name"/>
+        </div>
+        <div class="field">
+          <label>New Age</label>
+          <input type="number" id="upd-age" placeholder="Updated age" min="16" max="60"/>
+        </div>
+        <div class="field">
+          <label>New Course</label>
+          <input type="text" id="upd-course" placeholder="Updated course"/>
+        </div>
+      </div>
+
+      <button class="btn btn-gold" onclick="updateStudent()">✦ Update Student</button>
+      <div class="status-msg" id="upd-status"></div>
+    </div>
+  </div>
+
+  <!-- ── DELETE ── -->
+  <div class="panel" id="panel-delete">
+    <div class="card">
+      <div class="card-title">Delete Student</div>
+      <div class="card-desc">Enter the Student ID to permanently remove the record</div>
+
+      <div class="search-row">
+        <input type="text" id="del-id" placeholder="Enter Student ID to delete..."/>
+        <button class="btn btn-gold" onclick="deleteStudent()" style="background:var(--danger); color:#fff;">Delete</button>
+      </div>
+      <div class="status-msg" id="del-status"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const BASE = 'http://localhost:5033';
+
+  /* ── Tab Switcher ── */
+  function switchTab(name) {
+    document.querySelectorAll('.tab').forEach((t, i) => {
+      const names = ['view','add','search','update','delete'];
+      t.classList.toggle('active', names[i] === name);
+    });
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-' + name).classList.add('active');
+    if (name === 'view') loadAll();
+  }
+
+  /* ── Status helper ── */
+  function showStatus(id, msg, type) {
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    el.className = 'status-msg show ' + type;
+    setTimeout(() => el.classList.remove('show'), 4000);
+  }
+
+  /* ── Load All ── */
+  async function loadAll() {
+    try {
+      const res = await fetch(`${BASE}/api/student/getall`);
+      const data = await res.json();
+      renderTable(data);
+      renderStats(data);
+    } catch(e) {
+      document.getElementById('studentTable').innerHTML =
+        `<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">⚠️</div>Could not connect to API. Is the backend running?</div></td></tr>`;
+    }
+  }
+
+  function renderTable(data) {
+    const tbody = document.getElementById('studentTable');
+    if (!data.length) {
+      tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">📭</div>No students found. Add one!</div></td></tr>`;
+      return;
+    }
+    tbody.innerHTML = data.map(s => `
+      <tr>
+        <td><span class="id-badge">${s.id}</span></td>
+        <td>${s.name}</td>
+        <td>${s.age}</td>
+        <td>${s.course}</td>
+        <td><button class="btn btn-danger" onclick="quickDelete('${s.id}')">Remove</button></td>
+      </tr>
+    `).join('');
+  }
+
+  function renderStats(data) {
+    document.getElementById('statTotal').textContent = data.length;
+    const avgAge = data.length ? Math.round(data.reduce((a,b) => a + b.age, 0) / data.length) : '—';
+    document.getElementById('statAvgAge').textContent = avgAge;
+    const courses = new Set(data.map(s => s.course)).size;
+    document.getElementById('statCourses').textContent = courses;
+  }
+
+  /* ── Add ── */
+  async function addStudent() {
+    const student = {
+      id: document.getElementById('add-id').value.trim(),
+      name: document.getElementById('add-name').value.trim(),
+      age: parseInt(document.getElementById('add-age').value),
+      course: document.getElementById('add-course').value.trim()
+    };
+    if (!student.id || !student.name || !student.age || !student.course)
+      return showStatus('add-status', '⚠ Please fill in all fields', 'error');
+
+    try {
+      const res = await fetch(`${BASE}/api/student/add`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(student)
+      });
+      if (!res.ok) throw new Error();
+      showStatus('add-status', '✓ Student added successfully!', 'success');
+      ['add-id','add-name','add-age','add-course'].forEach(id => document.getElementById(id).value = '');
+    } catch { showStatus('add-status', '✕ Failed to add student', 'error'); }
+  }
+
+  /* ── Search ── */
+  async function searchStudent() {
+    const id = document.getElementById('search-id').value.trim();
+    if (!id) return showStatus('search-status', '⚠ Enter a Student ID', 'error');
+    try {
+      const res = await fetch(`${BASE}/api/student/${id}`);
+      if (!res.ok) throw new Error('Not found');
+      const s = await res.json();
+      document.getElementById('res-id').textContent = s.id;
+      document.getElementById('res-name').textContent = s.name;
+      document.getElementById('res-age').textContent = s.age + ' years';
+      document.getElementById('res-course').textContent = s.course;
+      document.getElementById('search-result').classList.add('show');
+    } catch { showStatus('search-status', '✕ Student not found', 'error'); document.getElementById('search-result').classList.remove('show'); }
+  }
+
+  /* ── Update ── */
+  async function updateStudent() {
+    const student = {
+      id: document.getElementById('upd-id').value.trim(),
+      name: document.getElementById('upd-name').value.trim(),
+      age: parseInt(document.getElementById('upd-age').value),
+      course: document.getElementById('upd-course').value.trim()
+    };
+    if (!student.id) return showStatus('upd-status', '⚠ Student ID is required', 'error');
+    try {
+      const res = await fetch(`${BASE}/api/student/update`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(student)
+      });
+      if (!res.ok) throw new Error();
+      showStatus('upd-status', '✓ Student updated successfully!', 'success');
+    } catch { showStatus('upd-status', '✕ Failed to update. Check the ID.', 'error'); }
+  }
+
+  /* ── Delete ── */
+  async function deleteStudent() {
+    const id = document.getElementById('del-id').value.trim();
+    if (!id) return showStatus('del-status', '⚠ Enter a Student ID', 'error');
+    await doDelete(id, 'del-status');
+    document.getElementById('del-id').value = '';
+  }
+
+  async function quickDelete(id) {
+    await doDelete(id, null);
+    loadAll();
+  }
+
+  async function doDelete(id, statusId) {
+    try {
+      const res = await fetch(`${BASE}/api/student/delete/${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error();
+      if (statusId) showStatus(statusId, '✓ Student deleted successfully!', 'success');
+    } catch { if (statusId) showStatus(statusId, '✕ Student not found', 'error'); }
+  }
+
+  // Load on start
+  loadAll();
+</script>
+</body>
+</html>
