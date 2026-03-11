@@ -5,6 +5,46 @@
 
 ---
 
+## 📸 Screenshots
+
+<div align="center">
+
+### 🖥️ Frontend — Student Dashboard
+<img width="800" alt="Student Dashboard" src="https://github.com/user-attachments/assets/fda9c258-181e-46a3-8802-b8631e128d54" />
+
+<br/>
+
+### ➕ Add Student
+<img width="800" alt="Add Student" src="https://github.com/user-attachments/assets/19d41230-cc14-446f-aa49-028c87435185" />
+
+<br/>
+
+### 🔍 Search Student
+<img width="800" alt="Search Student" src="https://github.com/user-attachments/assets/b2d798b0-c751-4d35-bbfe-6781a671042e" />
+
+<br/>
+
+### ✏️ Update Student
+<img width="800" alt="Update Student" src="https://github.com/user-attachments/assets/fb0c7a5d-f487-4b66-a843-bd52924ee8ad" />
+
+<br/>
+
+### 🗑️ Delete Student
+<img width="800" alt="Delete Student" src="https://github.com/user-attachments/assets/a86c2b0f-5d96-4d71-a799-7fcb373f2671" />
+
+<br/>
+
+### 📖 Swagger API Docs
+<img width="800" alt="Swagger UI" src="https://github.com/user-attachments/assets/0bd1fb3e-49ed-4c3b-acca-d2a20ea56720" />
+
+</div>
+
+---
+
+
+
+
+
 ## 📌 Table of Contents
 
 1. [What is this project?](#what-is-this-project)
